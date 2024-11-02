@@ -28,10 +28,10 @@ var nbtTests = []struct {
 	{LongArray{1, 2, 3}, "[L;1l,2l,3l]"},
 }
 
-func TestDecode(t *testing.T) {
+func TestParse(t *testing.T) {
 	for _, tt := range nbtTests {
 		t.Run(tt.out, func(t *testing.T) {
-			s, err := Decode(tt.in)
+			s, err := Parse(tt.in)
 			if err != nil {
 				t.Error(err)
 			}

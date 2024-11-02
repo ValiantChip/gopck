@@ -2,12 +2,13 @@ package nbt
 
 import (
 	"fmt"
-	"reflect"
 	"strconv"
 	"strings"
+
+	. "github.com/ValiantChip/gopck/src/util/parsing"
 )
 
-func Decode(d any) (string, error) {
+func Parse(d any) (string, error) {
 	if d == nil {
 		return "", nil
 	}
@@ -34,7 +35,7 @@ func Decode(d any) (string, error) {
 	case []any:
 		vals := make([]string, 0)
 		for _, v := range d.([]any) {
-			s, err := Decode(v)
+			s, err := Parse(v)
 			if err != nil {
 				return "", err
 			}
@@ -46,7 +47,7 @@ func Decode(d any) (string, error) {
 	case map[string]any:
 		vals := make([]string, 0)
 		for k, v := range d.(map[string]any) {
-			s, err := Decode(v)
+			s, err := Parse(v)
 			if err != nil {
 				return "", err
 			}
@@ -82,11 +83,11 @@ func Decode(d any) (string, error) {
 		result += strings.Join(vals, ",")
 		result += "]"
 		return result, nil
-	case Decodable:
-		return d.(Decodable).String(), nil
+	case Parsable:
+		return d.(Parsable).String(), nil
 	}
 
-	return "", UnsupportedTypeError{Err: fmt.Sprintf("decoder.Decode(): Error, type %s of d is not supported and does not implement Decodable", reflect.TypeOf(d).String())}
+	return "", UnsupportedTypeError{Err: fmt.Sprintf("decoder.Decode(): Unsupported type %T", d)}
 }
 
 type ByteArray []int8
@@ -94,15 +95,3 @@ type ByteArray []int8
 type IntArray []int32
 
 type LongArray []int64
-
-type Decodable interface {
-	String() string
-}
-
-type UnsupportedTypeError struct {
-	Err string
-}
-
-func (e UnsupportedTypeError) Error() string {
-	return e.Err
-}
