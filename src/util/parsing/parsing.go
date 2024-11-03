@@ -4,6 +4,10 @@ type Parsable interface {
 	String() string
 }
 
+type Unwrappable interface {
+	Unwrap() any
+}
+
 type UnsupportedTypeError struct {
 	Err string
 }

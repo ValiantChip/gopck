@@ -2,8 +2,11 @@ package nbt
 
 import (
 	"fmt"
+	"sort"
 	"strconv"
 	"strings"
+
+	. "github.com/ValiantChip/gopck/src/mc/types/arrays"
 
 	. "github.com/ValiantChip/gopck/src/util/parsing"
 )
@@ -45,9 +48,15 @@ func Parse(d any) (string, error) {
 		}
 		return "[" + strings.Join(vals, ",") + "]", nil
 	case map[string]any:
+		asMap := d.(map[string]any)
 		vals := make([]string, 0)
-		for k, v := range d.(map[string]any) {
-			s, err := Parse(v)
+		keys := make([]string, len(asMap))
+		for k := range asMap {
+			keys = append(keys, k)
+		}
+		sort.Strings(keys)
+		for _, k := range keys {
+			s, err := Parse(asMap[k])
 			if err != nil {
 				return "", err
 			}
@@ -83,15 +92,16 @@ func Parse(d any) (string, error) {
 		result += strings.Join(vals, ",")
 		result += "]"
 		return result, nil
+	case Unwrappable:
+		v, err := Parse(d.(Unwrappable).Unwrap())
+		if err != nil {
+			return "", err
+		}
+
+		return v, nil
 	case Parsable:
 		return d.(Parsable).String(), nil
 	}
 
 	return "", UnsupportedTypeError{Err: fmt.Sprintf("decoder.Decode(): Unsupported type %T", d)}
 }
-
-type ByteArray []int8
-
-type IntArray []int32
-
-type LongArray []int64

@@ -3,6 +3,7 @@ package nbt_test
 import (
 	"testing"
 
+	. "github.com/ValiantChip/gopck/src/mc/types/arrays"
 	. "github.com/ValiantChip/gopck/src/util/nbt"
 )
 
@@ -26,6 +27,8 @@ var nbtTests = []struct {
 	{ByteArray{1, 2, 3}, "[B;1b,2b,3b]"},
 	{IntArray{1, 2, 3}, "[I;1,2,3]"},
 	{LongArray{1, 2, 3}, "[L;1l,2l,3l]"},
+	{map[string]any{}, "{}"},
+	{[]any{}, "[]"},
 }
 
 func TestParse(t *testing.T) {

@@ -9,22 +9,24 @@ import (
 	"github.com/ValiantChip/gopck/src/util/parsing"
 )
 
-func Parse(d []struct {
-	Key   string
-	Value any
-}) (string, error) {
+func Parse(d []Component) (string, error) {
 	vals := make([]string, 0)
 	for _, v := range d {
-		s, err := ParseValue(v.Value)
+		s, err := ParseValue(v.Value())
 		if err != nil {
 			return "", err
 		}
 		if s != "" {
-			vals = append(vals, fmt.Sprintf("%s=%s", v.Key, s))
+			vals = append(vals, fmt.Sprintf("%s=%s", v.Key(), s))
 		}
 	}
 
 	return fmt.Sprintf("[%s]", strings.Join(vals, ",")), nil
+}
+
+type Component interface {
+	Key() string
+	Value() any
 }
 
 func ParseValue(d any) (string, error) {
@@ -41,6 +43,8 @@ func ParseValue(d any) (string, error) {
 		return strconv.FormatInt(int64(d.(int)), 10), nil
 	case int64:
 		return strconv.FormatInt(int64(d.(int64)), 10), nil
+	case int8:
+		return strconv.FormatInt(int64(d.(int8)), 10), nil
 	case string:
 		return fmt.Sprintf("\"%s\"", d.(string)), nil
 	case []any:
